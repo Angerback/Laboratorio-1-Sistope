@@ -11,25 +11,22 @@
 
 int main(int argc, char * argv[]){
   //printf("Soy el proceso hijo!!\n");
-
-  int i = 0, j =0;
+  int i = 0, j =0, n, n2, m2, m, aux;
+  int ** mat1;
+  int ** mat2;
+  int ** resultado;
   /*
   for(i = 0; i< argc; i++){
     printf("%s\n", argv[i]);
   }*/
   //Suma de matrices.
-
-  int n;
-  int m;
   //Se leen los valores dejados en el pipe para n y m
   read(STDIN_FILENO, &n, sizeof(int));
   read(STDIN_FILENO, &m, sizeof(int));
-  int ** mat1;
   mat1 = (int **)malloc(n * sizeof(int*));
   for(i = 0; i < n; i++){
     mat1[i] = (int *)malloc(m * sizeof(int));
   }
-  int aux;
   // se lee secuencialmente el valor para cada casilla de la mat1riz
   for ( i = 0; i < n; i++) {
     for (j = 0; j < m; j++) {
@@ -48,13 +45,9 @@ int main(int argc, char * argv[]){
     printf("\n");
   }*/
   // Se debe repetir el proceso para la segunda matriz de los sumandos:
-
-  int n2;
-  int m2;
   //Se leen los valores dejados en el pipe para n y m
   read(STDIN_FILENO, &n2, sizeof(int));
   read(STDIN_FILENO, &m2, sizeof(int));
-  int ** mat2;
   mat2 = (int **)malloc(n2 * sizeof(int*));
   for(i = 0; i < n2; i++){
     mat2[i] = (int *)malloc(m2 * sizeof(int));
@@ -77,7 +70,6 @@ int main(int argc, char * argv[]){
     printf("\n");
   }*/
 
-  int ** resultado;
   resultado = (int **)malloc(n * sizeof(int*));
   for(i = 0; i < n; i++){
     resultado[i] = (int *)malloc(m * sizeof(int));

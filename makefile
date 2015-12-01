@@ -1,6 +1,7 @@
 OBJDIR := build
 
-padre: ./src/padre.c ./src/operacion.c
+todo: ./src/padre.c ./src/suma.c
 	mkdir -p $(OBJDIR)
 	gcc ./src/padre.c -o ./build/padre
-	gcc ./src/operacion.c -o ./build/s
+	gcc ./src/suma.c -o ./build/s
+	gcc ./src/trans.c -o ./build/trans
