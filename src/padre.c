@@ -42,6 +42,7 @@ int iniciar_matriz(char matriz, int n, int m){
 }
 
 int operar(char * string, char * programa){
+
   //Para hacer suma, le paso las matrices por pipes y que sume.
   int piped[2]; // Para escribir en el hijo
   int piped2[2]; // Para leer desde el hijo
@@ -73,8 +74,9 @@ int operar(char * string, char * programa){
     //close(piped2[WRITE]);
     //int a = 2;
     //write(piped[WRITE], &a, sizeof(int));
-    int n = matrices[string[2]].n;
-    int m = matrices[string[2]].m;
+    char a = getIndex(string[0]), b = getIndex(string[2]), c = getIndex(string[4]);
+    int n = matrices[b].n;
+    int m = matrices[b].m;
     int i , j;
     //Se escriben n y m
     write(piped[WRITE], &n, sizeof(int));
@@ -82,20 +84,21 @@ int operar(char * string, char * programa){
     // Luego se escriben todos los valores de la matriz de forma secuencial
     for (i = 0; i < n; i++) {
       for (j = 0; j < m; j++) {
-        int aux = matrices[string[2]].matriz[i][j];
+        int aux = matrices[b].matriz[i][j];
         write(piped[WRITE], &aux, sizeof(int));
       }
     }
+
     //Se pasa la otra matriz:
-    n = matrices[string[4]].n;
-    m = matrices[string[4]].m;
+    n = matrices[c].n;
+    m = matrices[c].m;
 
     write(piped[WRITE], &n, sizeof(int));
     write(piped[WRITE], &m, sizeof(int));
     // Luego se escriben todos los valores de la matriz de forma secuencial
     for (i = 0; i < n; i++) {
       for (j = 0; j < m; j++) {
-        int aux = matrices[string[4]].matriz[i][j];
+        int aux = matrices[c].matriz[i][j];
         write(piped[WRITE], &aux, sizeof(int));
       }
     }
@@ -103,13 +106,13 @@ int operar(char * string, char * programa){
     int nres, mres;
     read(piped2[READ], &nres, sizeof(int));
     read(piped2[READ], &mres, sizeof(int));
-    iniciar_matriz(string[0], nres, mres);
+    iniciar_matriz(a, nres, mres);
 
     for (i = 0; i < nres; i++) {
       for (j = 0; j < mres; j++) {
         int aux;
         read(piped2[READ], &aux, sizeof(int));
-        matrices[string[0]].matriz[i][j] = aux;
+        matrices[a].matriz[i][j] = aux;
         //printf("%d\n", aux);
       }
     }
@@ -118,9 +121,81 @@ int operar(char * string, char * programa){
 
 }
 
+
+int operar2(char * string, char * programa, int constante){
+  //Para hacer suma, le paso las matrices por pipes y que sume.
+  int piped[2]; // Para escribir en el hijo
+  int piped2[2]; // Para leer desde el hijo
+  int p1 = pipe(piped);
+  int p2 = pipe(piped2);
+  if(p1 == -1 || p2 == -1){
+    printf("ERROR EN PIPES\n");
+  }
+  pid_t pid = fork();
+  if(pid == 0){
+    close(piped2[READ]);
+    close(piped[WRITE]);
+    // El hijo ejecuta el programa:
+    //dup2(piped[READ],STDIN_FILENO);
+    DUP2CLOSE(piped[READ],STDIN_FILENO);
+    DUP2CLOSE(piped2[WRITE],STDOUT_FILENO);
+    //printf("%d %d\n", STDIN_FILENO, STDOUT_FILENO);
+
+    //while ((dup2(piped[READ],STDIN_FILENO) == -1) && (errno == EINTR)) {printf("HOLI\n");}
+
+    //while ((dup2(piped2[WRITE],STDOUT_FILENO) == -1) && (errno == EINTR)) {printf("HOLI\n");}
+
+    //El hijo lee lo que le llega.
+    execl(programa, programa, (char *) 0);
+  }else{
+    close(piped2[WRITE]);
+    close(piped[READ]);
+    char a = getIndex(string[0]), b = getIndex(string[2]);
+    //close(piped2[WRITE]);
+    //int a = 2;
+    //write(piped[WRITE], &a, sizeof(int));
+    int n = matrices[b].n;
+    int m = matrices[b].m;
+    int i , j;
+    //Se escriben n y m
+    write(piped[WRITE], &n, sizeof(int));
+    write(piped[WRITE], &m, sizeof(int));
+    // Luego se escriben todos los valores de la matriz de forma secuencial
+    for (i = 0; i < n; i++) {
+      for (j = 0; j < m; j++) {
+        int aux = matrices[b].matriz[i][j];
+        write(piped[WRITE], &aux, sizeof(int));
+      }
+    }
+
+    int c = constante;
+    printf("Constante 2: %d\n",c);
+		write(piped[WRITE], &c, sizeof(int));
+    // Finalmente, guarda el valor calculado por el hijo en la variable local.
+    int nres, mres;
+    read(piped2[READ], &nres, sizeof(int));
+    read(piped2[READ], &mres, sizeof(int));
+    iniciar_matriz(a, nres, mres);
+
+    for (i = 0; i < nres; i++) {
+      for (j = 0; j < mres; j++) {
+        int aux;
+        read(piped2[READ], &aux, sizeof(int));
+        matrices[a].matriz[i][j] = aux;
+        //printf("%d\n", aux);
+      }
+    }
+
+  }
+
+}
+
+
+
 // Sacado de stackoverflow
 // http://stackoverflow.com/questions/9210528/split-string-with-delimiters-in-c
 // Usuario hmjd
+// Separa un string a partir de un delimitador
 char** str_split(char* a_str, const char a_delim)
 {
     char** result    = 0;
@@ -524,8 +599,28 @@ int shell(){
         //printf("%c = %d\n", string[0], string[0] - 65);
       }else if(string[3] == '-'){
         printf("Hacer resta\n");
+				operar(string, "./r");
       }else if(string[3] == '*'){
-        printf("Hacer multiplicacion\n");
+				if(string[4] >= 65 && string[4] <= 90){
+        	printf("Hacer multiplicacion por matriz\n");
+					operar(string, "./mul");
+				}else{
+					//Multiplicar por constante.
+					int largo_string = strlen(string);
+					int index = 0, index2;
+					char numero_string[15];
+					for(index = 4; index < largo_string; index++){
+						if(index >= 15){
+							break;
+						}
+						numero_string[index - 4] = string[index];
+					}
+					//Con la copia del string se intenta pasar a numero
+					//En caso de que se ingresen datos no numericos, atoi retorna 0 por defecto
+					int numero = atoi(numero_string);
+					printf("Constante: %d\n", numero);
+					operar2(string, "./mulc", numero);
+				}
       }else{
         printf("Opción no válida.\n");
       }
