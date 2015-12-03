@@ -12,7 +12,7 @@
 
 ### Comandos ###
 
-El programa recibe comandos al estilo de una shell, por lo que para operar se deben seguir la siguiente estructura.
+El programa recibe comandos al estilo de una shell, por lo que para operar se debe seguir la siguiente estructura.
 
 * load <MATRIZ> <ARCHIVO>
 El comando load carga un archivo de texto, lo decodifica y guarda la matriz contenida en un slot de memoria. MATRIZ = [A-Z] y ARCHIVO debe ser el nombre del archivo en cuestión. Se recomienda que el archivo esté en la carpeta build.
