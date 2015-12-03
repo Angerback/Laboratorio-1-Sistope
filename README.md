@@ -11,4 +11,16 @@
 
 * Compilar en la raíz del proyecto con el comando make. Luego ejecutar el programa "padre" del directorio ./build.
 
-### Your title here... ###
+### Comandos ###
+
+El programa recibe comandos al estilo de una shell, por lo que para operar se deben seguir los siguientes comandos.
+
+* load <MATRIZ> <ARCHIVO>
+El comando load carga un archivo de texto, lo decodifica y guarda la matriz contenida en un slot de memoria. MATRIZ = [A-Z] y ARCHIVO debe ser el nombre del archivo en cuestión. Se recomienda que el archivo esté en la carpeta build.
+Ejemplo: load A archivo.txt
+
+* save <MATRIZ> <ARCHIVO>
+El comando save guarda una matriz existente en memoria en un archivo de texto. Si el archivo no existe, lo creará. MATRIZ = [A-Z] y ARCHIVO es el nombre del archivo a crear/actualizar. La matriz debe existir en memoria.
+Ejemplo: load B bguardado.txt
+
+* 
